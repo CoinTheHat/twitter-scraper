@@ -4,6 +4,35 @@ Multi-account Twitter/X tweet scraper with automatic rate-limit handling and acc
 
 Uses cookie-based authentication via [@steipete/bird](https://github.com/nicklama/bird-cli) CLI — no official Twitter API key required.
 
+## What Can You Get?
+
+Every tweet returned includes:
+
+| Data | Description |
+|------|-------------|
+| **Tweet text** | Full tweet content |
+| **Author name** | Display name (e.g. "Elon Musk") |
+| **Author username** | Handle (e.g. "elonmusk") |
+| **Author avatar** | Profile picture URL |
+| **Follower count** | Author's follower count |
+| **Views** | Tweet view/impression count |
+| **Likes** | Like count |
+| **Retweets** | Retweet count |
+| **Date** | Tweet creation date |
+| **Tweet URL** | Direct link to the tweet |
+| **Tweet ID** | Unique tweet identifier |
+
+### Use Cases
+
+- **Sentiment analysis** — pull tweets about a topic and feed them to an AI model
+- **Trend monitoring** — track what people are saying about any keyword, hashtag, or event
+- **Brand monitoring** — search mentions of your brand/product
+- **Research** — collect tweets from specific users or about specific topics
+- **Engagement analytics** — analyze likes, retweets, views, and follower counts
+- **News tracking** — monitor breaking news via hashtags or from news accounts
+- **Influencer analysis** — find high-follower authors tweeting about your topic
+- **Content curation** — collect tweets for newsletters, dashboards, or reports
+
 ## Features
 
 - **Multi-account pool** — rotate across multiple Twitter accounts automatically
@@ -11,6 +40,7 @@ Uses cookie-based authentication via [@steipete/bird](https://github.com/nicklam
 - **Deadlock detection** — force-releases stuck accounts after 3 minutes
 - **Fallback queries** — try multiple search terms in order, use first one with results
 - **Warmup** — mimics human behavior to avoid detection
+- **Automatic retries** — retries with a different account if first attempt fails
 
 ## Quick Start
 
@@ -24,9 +54,9 @@ cp .env.example .env
 ### Get Your Twitter Cookies
 
 1. Log into [x.com](https://x.com) in your browser
-2. Open DevTools → Application → Cookies → `https://x.com`
-3. Copy `auth_token` and `ct0` values
-4. Paste them into `.env`
+2. Open DevTools (F12) → Application → Cookies → `https://x.com`
+3. Copy the values of `auth_token` and `ct0`
+4. Paste them into your `.env` file
 
 ### Usage
 
@@ -37,6 +67,11 @@ const scraper = new TwitterScraper();
 
 // Simple search
 const tweets = await scraper.search('artificial intelligence', 10);
+
+for (const tweet of tweets) {
+  console.log(`@${tweet.author.screen_name}: ${tweet.text}`);
+  console.log(`  likes: ${tweet.likes} | views: ${tweet.views} | followers: ${tweet.author.followers}`);
+}
 
 // Search with fallback queries (tries in order, returns first with results)
 const results = await scraper.searchWithFallback([
@@ -139,6 +174,21 @@ await scraper.search('typescript min_faves:100');
 
 // Combine anything
 await scraper.search('from:naval investing -filter:retweets min_faves:50');
+
+// Date range
+await scraper.search('AI since:2025-01-01 until:2025-06-01');
+
+// Language filter
+await scraper.search('machine learning lang:en');
+
+// Near a location
+await scraper.search('concert near:london within:15mi');
+
+// Only tweets with links
+await scraper.search('startup funding filter:links');
+
+// Only tweets with media
+await scraper.search('landscape photography filter:media');
 ```
 
 ## Multiple Accounts
@@ -156,6 +206,20 @@ TWITTER_AUTH_TOKENS=token_acct1,token_acct2,token_acct3
 TWITTER_CT0S=ct0_acct1,ct0_acct2,ct0_acct3
 TWITTER_PROXIES=http://proxy1:8080,http://proxy2:8080,http://proxy3:8080
 ```
+
+## Security
+
+- **No env leakage** — only `PATH`, `HOME`, and auth credentials are passed to the subprocess. Your other environment variables (database URLs, API keys, etc.) are never exposed.
+- **No shell injection** — all subprocess calls use `execFile` with argument arrays, not `exec` with string interpolation. Query strings cannot execute shell commands.
+- **Credentials stay local** — `.env` is in `.gitignore` by default. Never commit your cookies.
+- **Cookie rotation** — if a cookie gets rate-limited or banned, only that account is affected. Others continue working.
+
+### Best Practices
+
+- Use a **dedicated Twitter account** for scraping, not your main account
+- **Rotate cookies** periodically — they can expire or get invalidated
+- Use **proxies** if you're doing high-volume scraping to avoid IP-based rate limits
+- Keep your `.env` file out of version control (already in `.gitignore`)
 
 ## License
 

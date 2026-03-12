@@ -223,7 +223,7 @@ export class TwitterAccountManager {
 
     /** Warm up an account by fetching a random popular profile */
     async performWarmup(account: TwitterAccount): Promise<void> {
-        const profiles = ['elonmusk', 'CoinGecko', 'solana', 'ethereum', 'VitalikButerin'];
+        const profiles = ['elonmusk', 'NASA', 'Google', 'BBCBreaking', 'nytimes'];
         const pick = profiles[Math.floor(Math.random() * profiles.length)];
 
         try {

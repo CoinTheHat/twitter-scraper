@@ -74,7 +74,9 @@ export class BirdService {
             account.searchCount++;
 
             const env: Record<string, string> = {
-                ...process.env as Record<string, string>,
+                PATH: process.env.PATH || '',
+                HOME: process.env.HOME || process.env.USERPROFILE || '',
+                NODE_ENV: process.env.NODE_ENV || '',
                 AUTH_TOKEN: account.authToken,
                 CT0: account.ct0
             };
