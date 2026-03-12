@@ -1,0 +1,26 @@
+{
+  "name": "twitter-scraper",
+  "version": "1.0.0",
+  "description": "Multi-account Twitter/X tweet scraper with rate-limit handling, account rotation, and spam filtering",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts",
+    "example": "ts-node examples/basic.ts"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": ["twitter", "x", "scraper", "tweets", "search"],
+  "license": "MIT",
+  "dependencies": {
+    "@steipete/bird": "^0.4.1",
+    "dotenv": "^17.2.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
