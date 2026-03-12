@@ -1,6 +1,6 @@
 # twitter-scraper
 
-Multi-account Twitter/X tweet scraper with automatic rate-limit handling, account rotation, and spam filtering.
+Multi-account Twitter/X tweet scraper with automatic rate-limit handling and account rotation.
 
 Uses cookie-based authentication via [@steipete/bird](https://github.com/nicklama/bird-cli) CLI — no official Twitter API key required.
 
@@ -10,7 +10,6 @@ Uses cookie-based authentication via [@steipete/bird](https://github.com/nicklam
 - **Rate limit handling** — 15min cooldown on 429, automatic account switching
 - **Deadlock detection** — force-releases stuck accounts after 3 minutes
 - **Multi-tier query fallback** — tries `$SYMBOL` → `"Name" solana` → `SYMBOL solana` → contract address
-- **Spam filtering** — removes airdrop/giveaway/promo tweets
 - **Warmup** — mimics human behavior to avoid detection
 
 ## Quick Start
@@ -79,7 +78,6 @@ All config is via environment variables (`.env` file supported):
 const scraper = new TwitterScraper({
   maxTweets: 30,        // tweets per search (default: 30)
   maxRetries: 2,        // retry attempts (default: 2)
-  spamKeywords: [...],  // custom spam filter words
 
   // Account pool tuning
   rateLimitCooldownMs: 15 * 60 * 1000,  // 15min (default)
