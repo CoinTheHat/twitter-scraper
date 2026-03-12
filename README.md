@@ -9,7 +9,7 @@ Uses cookie-based authentication via [@steipete/bird](https://github.com/nicklam
 - **Multi-account pool** — rotate across multiple Twitter accounts automatically
 - **Rate limit handling** — 15min cooldown on 429, automatic account switching
 - **Deadlock detection** — force-releases stuck accounts after 3 minutes
-- **Multi-tier query fallback** — tries `$SYMBOL` → `"Name" solana` → `SYMBOL solana` → contract address
+- **Fallback queries** — try multiple search terms in order, use first one with results
 - **Warmup** — mimics human behavior to avoid detection
 
 ## Quick Start
@@ -35,18 +35,18 @@ import { TwitterScraper } from './src';
 
 const scraper = new TwitterScraper();
 
-// Search by token
-const tweets = await scraper.searchToken({
-  symbol: 'PEPE',
-  name: 'Pepe',
-  mint: '5z3EqYQo9HiCEs3R84RCDMu...' // optional
-});
+// Simple search
+const tweets = await scraper.search('artificial intelligence', 10);
 
-// Raw query
-const results = await scraper.search('solana meme coin', 10);
+// Search with fallback queries (tries in order, returns first with results)
+const results = await scraper.searchWithFallback([
+  '#OpenAI',           // try first
+  'ChatGPT news',     // fallback
+  'AI language model'  // last resort
+]);
 
-// Just texts (for AI/sentiment)
-const texts = await scraper.searchTokenTexts({ symbol: 'WIF', name: 'dogwifhat' });
+// Get just texts (for AI/NLP pipelines)
+const texts = await scraper.searchTexts('from:elonmusk', 5);
 ```
 
 ### Run the Example
@@ -87,6 +87,15 @@ const scraper = new TwitterScraper({
 });
 ```
 
+**Methods:**
+
+| Method | Description |
+|--------|-------------|
+| `search(query, limit?)` | Search tweets with any query |
+| `searchWithFallback(queries[], limit?)` | Try queries in order, return first with results |
+| `searchTexts(query, limit?)` | Same as search but returns only tweet texts |
+| `getAccountManager()` | Access account manager for advanced usage |
+
 ### `Tweet` object
 
 ```typescript
@@ -107,18 +116,29 @@ interface Tweet {
 }
 ```
 
-### `QueryBuilder`
-
-Build search queries manually:
+### Search Query Examples
 
 ```typescript
-import { QueryBuilder } from './src';
+// Keywords
+await scraper.search('bitcoin price prediction');
 
-const queries = QueryBuilder.build('Pepe', 'PEPE', 'mint_address');
-// => ['$PEPE', '"Pepe" solana', 'PEPE solana', '5z3EqYQo']
+// Hashtags
+await scraper.search('#AI #machinelearning');
 
-const custom = QueryBuilder.fromKeywords('bitcoin', 'ETF', 'approval');
-// => ['bitcoin', 'ETF', 'approval']
+// From specific user
+await scraper.search('from:elonmusk');
+
+// Mentions
+await scraper.search('@openai');
+
+// Exclude retweets
+await scraper.search('ChatGPT -filter:retweets');
+
+// Minimum engagement
+await scraper.search('typescript min_faves:100');
+
+// Combine anything
+await scraper.search('from:naval investing -filter:retweets min_faves:50');
 ```
 
 ## Multiple Accounts

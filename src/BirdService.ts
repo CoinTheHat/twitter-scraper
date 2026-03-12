@@ -2,7 +2,6 @@ import { execFile } from 'child_process';
 import util from 'util';
 import { logger } from './logger';
 import { TwitterAccountManager, TwitterAccount } from './TwitterAccountManager';
-import { QueryBuilder } from './QueryBuilder';
 
 const execFileAsync = util.promisify(execFile);
 
@@ -30,21 +29,22 @@ export class BirdService {
     }
 
     /**
-     * Search tweets with automatic fallback through multiple query tiers.
-     * Tries cashtag first, then name+context, symbol+context, and finally contract address.
+     * Try multiple queries in order, return results from the first one that finds tweets.
+     * Useful when you have fallback search terms.
+     *
+     * @param queries - Array of search queries to try in order
+     * @param limit - Max tweets to return
      */
-    async searchWithFallback(token: { symbol: string; name: string; mint?: string }, limit: number = 20): Promise<Tweet[]> {
-        const queries = QueryBuilder.build(token.name, token.symbol, token.mint);
-
+    async searchWithFallback(queries: string[], limit: number = 20): Promise<Tweet[]> {
         for (let i = 0; i < queries.length; i++) {
             const results = await this.search(queries[i], limit);
             if (results.length > 0) {
-                if (i > 0) logger.info(`[Bird] Fallback success on Tier ${i + 1} (${queries[i]}) -> ${results.length} tweets`);
+                if (i > 0) logger.info(`[Bird] Fallback success on query #${i + 1} ("${queries[i]}") -> ${results.length} tweets`);
                 return results;
             }
         }
 
-        logger.warn(`[Bird] All query tiers failed for ${token.symbol}. No tweets found.`);
+        logger.warn(`[Bird] All ${queries.length} queries returned 0 results.`);
         return [];
     }
 

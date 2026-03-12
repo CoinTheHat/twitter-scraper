@@ -26,60 +26,58 @@ export class TwitterScraper {
     }
 
     /**
-     * Search tweets for a token using multi-tier query fallback.
-     * Returns full Tweet objects with author info, engagement metrics, etc.
+     * Search tweets with a query string.
      *
-     * @param token - Token to search for
+     * @param query - Search query (e.g. "bitcoin", "from:elonmusk", "#AI")
+     * @param limit - Max tweets to return (overrides default maxTweets)
      * @returns Array of Tweet objects
      */
-    async searchToken(token: { symbol: string; name: string; mint?: string }): Promise<Tweet[]> {
-        const allTweets: Map<string, Tweet> = new Map();
+    async search(query: string, limit?: number): Promise<Tweet[]> {
+        const max = limit ?? this.maxTweets;
+        let allTweets: Map<string, Tweet> = new Map();
         let attempts = 0;
 
         while (attempts < this.maxRetries) {
             attempts++;
             try {
-                const results = await this.bird.searchWithFallback(token, this.maxTweets);
+                const results = await this.bird.search(query, max);
                 for (const tweet of results) {
                     allTweets.set(tweet.id, tweet);
                 }
             } catch (e) {
-                logger.warn(`[Scraper] Search failed for ${token.symbol}: ${e}`);
+                logger.warn(`[Scraper] Search failed: ${e}`);
             }
 
             if (allTweets.size > 0) {
-                logger.info(`[Scraper] Found ${allTweets.size} tweets for ${token.symbol} on attempt ${attempts}.`);
+                logger.info(`[Scraper] Found ${allTweets.size} tweets on attempt ${attempts}.`);
                 break;
             }
 
             if (attempts < this.maxRetries) {
-                logger.warn(`[Scraper] Attempt ${attempts} returned 0 tweets for ${token.symbol}. Retrying...`);
+                logger.warn(`[Scraper] Attempt ${attempts} returned 0 tweets. Retrying...`);
             }
-        }
-
-        if (allTweets.size === 0) {
-            logger.warn(`[Scraper] No tweets found for ${token.symbol} after ${attempts} attempts.`);
         }
 
         return Array.from(allTweets.values());
     }
 
     /**
-     * Search tweets with a raw query string.
+     * Try multiple queries in order — returns results from the first one that finds tweets.
+     * Useful when you have primary + fallback search terms.
      *
-     * @param query - Raw search query
+     * @param queries - Array of queries to try in order (e.g. ["$BTC", "bitcoin crypto"])
      * @param limit - Max tweets to return
-     * @returns Array of Tweet objects
+     * @returns Array of Tweet objects from the first successful query
      */
-    async search(query: string, limit?: number): Promise<Tweet[]> {
-        return this.bird.search(query, limit ?? this.maxTweets);
+    async searchWithFallback(queries: string[], limit?: number): Promise<Tweet[]> {
+        return this.bird.searchWithFallback(queries, limit ?? this.maxTweets);
     }
 
     /**
-     * Search tweets and return only the text content (simplified output).
+     * Search and return only the text content (useful for AI/NLP pipelines).
      */
-    async searchTokenTexts(token: { symbol: string; name: string; mint?: string }): Promise<string[]> {
-        const tweets = await this.searchToken(token);
+    async searchTexts(query: string, limit?: number): Promise<string[]> {
+        const tweets = await this.search(query, limit);
         return tweets.map(t => t.text);
     }
 
