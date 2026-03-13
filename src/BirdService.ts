@@ -71,8 +71,6 @@ export class BirdService {
                 await this.accountManager.performWarmup(account);
             }
 
-            account.searchCount++;
-
             const env: Record<string, string> = {
                 PATH: process.env.PATH || '',
                 HOME: process.env.HOME || process.env.USERPROFILE || '',
@@ -89,7 +87,7 @@ export class BirdService {
             const args = ['@steipete/bird', 'search', query, '--count', String(limit), '--json'];
 
             logger.info(`[Bird] Searching: "${query}" (Account #${account.index + 1})`);
-            const { stdout } = await execFileAsync('npx', args, { env, timeout: 10000 });
+            const { stdout } = await execFileAsync('npx', args, { env, timeout: 30000 });
 
             try {
                 const rawData = JSON.parse(stdout);

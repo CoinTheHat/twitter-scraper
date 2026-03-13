@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1200px;
+    height: 675px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0f0f0f;
+    font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+  }
+  .card {
+    width: 1160px;
+    height: 635px;
+    background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(29,161,242,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .card::after {
+    content: '';
+    position: absolute;
+    bottom: -50px;
+    left: -50px;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(114,137,218,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .top { position: relative; z-index: 1; }
+  .badge {
+    display: inline-block;
+    background: rgba(29,161,242,0.15);
+    color: #1da1f2;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(29,161,242,0.3);
+    margin-bottom: 28px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  h1 {
+    font-size: 52px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.15;
+    margin-bottom: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  h1 span { color: #1da1f2; }
+  .subtitle {
+    font-size: 20px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.6;
+    max-width: 700px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  .code-block {
+    position: relative;
+    z-index: 1;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 24px 30px;
+    margin-top: 10px;
+  }
+  .code-header {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+  .dot.r { background: #ff5f57; }
+  .dot.y { background: #ffbd2e; }
+  .dot.g { background: #28c840; }
+  .code {
+    font-size: 17px;
+    line-height: 1.8;
+    color: #e2e8f0;
+  }
+  .kw { color: #c792ea; }
+  .fn { color: #82aaff; }
+  .str { color: #c3e88d; }
+  .cm { color: #546e7a; }
+  .op { color: #89ddff; }
+  .bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    position: relative;
+    z-index: 1;
+  }
+  .features {
+    display: flex;
+    gap: 28px;
+  }
+  .feature {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.5);
+    font-size: 15px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  .feature .icon {
+    color: #1da1f2;
+    font-size: 18px;
+  }
+  .gh {
+    color: rgba(255,255,255,0.4);
+    font-size: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="top">
+      <div class="badge">Open Source</div>
+      <h1>twitter<span>-</span>scraper</h1>
+      <p class="subtitle">Multi-account Twitter/X scraper with rate-limit handling, account rotation & automatic retries. No API key needed.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="dot r"></div>
+        <div class="dot y"></div>
+        <div class="dot g"></div>
+      </div>
+      <div class="code">
+        <span class="kw">const</span> scraper <span class="op">=</span> <span class="kw">new</span> <span class="fn">TwitterScraper</span><span class="op">();</span><br>
+        <span class="kw">const</span> tweets <span class="op">=</span> <span class="kw">await</span> scraper.<span class="fn">search</span><span class="op">(</span><span class="str">'artificial intelligence'</span><span class="op">,</span> <span class="str">20</span><span class="op">);</span><br>
+        <span class="cm">// → text, author, followers, likes, retweets, views, url</span>
+      </div>
+    </div>
+
+    <div class="bottom">
+      <div class="features">
+        <div class="feature"><span class="icon">&#x2192;</span> Multi-account rotation</div>
+        <div class="feature"><span class="icon">&#x2192;</span> Rate-limit handling</div>
+        <div class="feature"><span class="icon">&#x2192;</span> Fallback queries</div>
+        <div class="feature"><span class="icon">&#x2192;</span> TypeScript</div>
+      </div>
+      <div class="gh">github.com/CoinTheHat/twitter-scraper</div>
+    </div>
+  </div>
+</body>
+</html>
